@@ -33,6 +33,7 @@ try:
         reader = csv.DictReader(file)
         # Build contents of table from csv file
         for film in reader:
+            # Handle if an apostrophe is in film title or director's name
             if "'" in film['Name']:
                 film['Name'] = film['Name'].replace("'", "''")
             if "'" in film['Director']:
