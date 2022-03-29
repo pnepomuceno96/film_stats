@@ -5,6 +5,7 @@ import psycopg2
 from psycopg2 import Error
 
 try:
+    # Connecting to SQL server
     conn = psycopg2.connect(user = "francisc.nepomuceno",
                         password="*",
                         host="192.168.1.225",
@@ -26,7 +27,8 @@ try:
         ); '''
     cur.execute(create_table_query)
     conn.commit()
-    print("Table created successfully in PostgreSQL")
+    # Confirm creation of table header
+    print("Table header created successfully in PostgreSQL")
     with open('diary.csv', 'r', encoding = 'iso-8859-1') as file:
         reader = csv.DictReader(file)
         # Build contents of table from csv file
@@ -35,6 +37,7 @@ try:
                 film['Name'] = film['Name'].replace("'", "''")
             if "'" in film['Director']:
                 film['Director'] = film['Director'].replace("'", "''")
+            # Add info via SQL query
             insert_query = ''' INSERT INTO films (movie_title, director, year, rating, rewatch, tags, date_watched) VALUES ('{}', '{}', {}, '{}', '{}', '{}', '{}')'''.format(film['Name'], film['Director'], film['Year'], film['Rating'], film['Rewatch'], film['Tags'], film['Watched Date'])
             #print(insert_query)
             cur.execute(insert_query)
@@ -43,8 +46,10 @@ try:
     # Result
     cur.execute("SELECT * from films")
     print("Result ", cur.fetchall())
+# Raise exception for connection error
 except(Exception, Error) as error:
     print("Error while connecting to PostgreSQL", error)
+# Close connection
 finally:
     if conn:
         cur.close()
