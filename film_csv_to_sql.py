@@ -4,16 +4,7 @@ import csv
 import psycopg2
 from psycopg2 import Error
 
-try:
-    # Connecting to SQL server
-    conn = psycopg2.connect(user = "francisc.nepomuceno",
-                        password="*",
-                        host="192.168.1.225",
-                        port="5432",
-                        database="francisc.nepomuceno"
-                        )
-
-    cur = conn.cursor()
+def create_table(connection, cursor):
     # Create table and header
     create_table_query = '''drop table if exists public.films; CREATE TABLE public.films
         (
@@ -25,8 +16,8 @@ try:
         tags varchar,
         date_watched varchar
         ); '''
-    cur.execute(create_table_query)
-    conn.commit()
+    cursor.execute(create_table_query)
+    connection.commit()
     # Confirm creation of table header
     print("Table header created successfully in PostgreSQL")
     with open('diary.csv', 'r', encoding = 'iso-8859-1') as file:
@@ -41,9 +32,21 @@ try:
             # Add info via SQL query
             insert_query = ''' INSERT INTO films (movie_title, director, year, rating, rewatch, tags, date_watched) VALUES ('{}', '{}', {}, '{}', '{}', '{}', '{}')'''.format(film['Name'], film['Director'], film['Year'], film['Rating'], film['Rewatch'], film['Tags'], film['Watched Date'])
             #print(insert_query)
-            cur.execute(insert_query)
-            conn.commit()
+            cursor.execute(insert_query)
+            connection.commit()
         print("Film data inserted successfully")
+
+
+try:
+    # Connecting to SQL server
+    conn = psycopg2.connect(user = "francisc.nepomuceno",
+                        host="192.168.1.225",
+                        port="5432",
+                        database="francisc.nepomuceno"
+                        )
+
+    cur = conn.cursor()
+    create_table(conn, cur)
     # Result
     cur.execute("SELECT * from films")
     print("Result ", cur.fetchall())
